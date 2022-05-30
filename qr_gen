@@ -1,0 +1,32 @@
+import qrcode
+import uuid
+import mysql.connector
+
+# Create ID and URL
+id = uuid.uuid4()
+url = "https://" . CONFIG['url'] . "/" . id
+
+# Connect to database
+mydb = mysql.connector.connect(
+  host="localhost",
+  user= CONFIG['user'],
+  password= CONFIG['password'],
+  database= CONFIG['database']
+)
+
+mycursor = mydb.cursor()
+
+sql = "INSERT INTO Information (id) VALUES (%s)"
+val = (id)
+mycursor.execute(sql, val)
+mydb.commit()
+
+# Create image
+qr = qrcode.QRCode(version=1, box_size=10, border=5)
+qr.add_data(url)
+qr.make(fit=True)
+
+img = qr.make_image(fill='black', back_color='white')
+img.save('qrcode001.png')
+
+# Print Image.
